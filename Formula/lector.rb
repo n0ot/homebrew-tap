@@ -32,12 +32,14 @@ class Lector < Formula
   head do
     url "https://github.com/n0ot/lector.git", branch: "master"
 
-    depends_on "rust" => :build
+    depends_on "rustup" => :build
   end
 
   def install
     if build.head?
-      system "cargo", "install", *std_cargo_args, "--bin", "lector"
+      toolchain = Utils.safe_popen_read("scripts/check-rust-toolchain", "--channel").strip
+      system "rustup", "toolchain", "install", toolchain, "--profile", "minimal"
+      system "rustup", "run", toolchain, "cargo", "install", *std_cargo_args, "--bin", "lector"
     else
       bin.install "lector"
     end
